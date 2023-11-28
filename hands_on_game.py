@@ -9,6 +9,7 @@
 
 
 import math
+import random
 import sys
 
 import cv2
@@ -72,18 +73,15 @@ class Worker1(QThread):
                     
                     if (height != 0 and width != 0):
                         cv2.rectangle(imgOutput, (x-offset, y-offset-50),
-                                        (x-offset+90, y-offset-50+50), (255, 0, 255), cv2.FILLED),
+                                        (x-offset+90, y-offset-50+50), (250, 231, 93), cv2.FILLED),
                         cv2.putText(imgOutput, labels[index], (x, y-26), cv2.FONT_HERSHEY_COMPLEX, 1.7, (255, 255, 255), 2)
                         self.TextUpdate.emit(labels[index])
                         cv2.rectangle(imgOutput, (x-offset, y-offset),
-                                        (x + w+offset, y + h+offset), (255, 0, 255), 4),
+                                        (x + w+offset, y + h+offset), (250, 231, 93), 4),
 
                 
                 ConvertToQtFormat = QImage(imgOutput.data, imgOutput.shape[1], imgOutput.shape[0], QImage.Format_RGB888)
-                #Pic = ConvertToQtFormat.scaled(imgOutput.shape[1] * 0.8, imgOutput.shape[0] * 0.8, Qt.KeepAspectRatio)
-                Pic = ConvertToQtFormat.scaled(int(imgOutput.shape[1] * 0.8), int(imgOutput.shape[0] * 0.8),
-                                               Qt.KeepAspectRatio)
-
+                Pic = ConvertToQtFormat.scaled(imgOutput.shape[1] * 0.8, imgOutput.shape[0] * 0.8, Qt.KeepAspectRatio)
                 self.ImageUpdate.emit(Pic)
 
     def stop(self):
@@ -122,8 +120,6 @@ class Ui_Form(object):
         self.container_cam.setObjectName("container_cam")
         self.correct = QFrame(Form)
         self.correct.setGeometry(QRect(530, 320, 91, 101))
-        self.correct.setStyleSheet("image: url(correct.png);\n"
-"background-color: transparent;")
         self.correct.setFrameShape(QFrame.StyledPanel)
         self.correct.setFrameShadow(QFrame.Raised)
         self.correct.setObjectName("correct")
@@ -178,7 +174,7 @@ class Ui_Form(object):
         
     def TextUpdateSlot(self, message):
         #self.palavraFlag.setText(f'x-> {message}')
-
+        is_correct = False
         for i in range(len(self.palavraFlag)):
              if type(message) == str:
                 if self.palavraFlag[i] == message:
@@ -186,6 +182,22 @@ class Ui_Form(object):
                         font.setPointSize(34)  # Define o tamanho da fonte para 16 (ou outro tamanho desejado)
                         self.list_object[i].setFont(font)  # Aplica a nova fonte ao QLabel
                         self.list_object[i].setText(message)
+                        is_correct = True
+        
+        list_for_x = list(range(525,535))
+        list_for_y = list(range(315,325))
+
+        numero_sorteado_x = random.choice(list_for_x)
+        numero_sorteado_y = random.choice(list_for_y)
+
+        if is_correct:
+            self.correct.setStyleSheet("image: url(correct.png);\n"
+"background-color: transparent;")
+            self.correct.setGeometry(QRect(numero_sorteado_x, numero_sorteado_y, 91, 101))
+        else:
+            self.correct.setStyleSheet("image: url(loser.png);\n"
+"background-color: transparent;")
+            self.correct.setGeometry(QRect(numero_sorteado_x, numero_sorteado_y, 91, 101))
                         
                 
     def CancelFeed(self):
